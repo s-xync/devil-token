@@ -3,6 +3,7 @@ import Web3 from 'web3';
 import TruffleContract from 'truffle-contract';
 import DevilToken from '../contracts/DevilToken.json';
 import Navbar from './navbar.jsx';
+import MetamaskComponent from './metamask.jsx'
 
 
 class App extends Component{
@@ -10,9 +11,9 @@ class App extends Component{
     super(props)
     this.state =
     {
-        account:null,
-        balance:0,
-        network:0
+      account:null,
+      balance:0,
+      network:0
     };
 
     this.isWeb3=true;
@@ -71,17 +72,62 @@ class App extends Component{
     console.log(this.state);
     console.log(this.isWeb3);
     console.log(this.isWeb3Locked);
+    /*    if(this.isWeb3 && !this.isWeb3Locked){
+    // web3 is available and also the wallet is unlocked
+    return(
+    <React.Fragment>
+    <Navbar walletStatus="" sendStatus="disabled"></Navbar>
+    <div className="container">
+    <h1>Hi</h1>
+    <p>{this.state.account}</p>
+    <p>{this.state.balance}</p>
+    </div>
+    </React.Fragment>
+    );
+    }else if(this.isWeb3 && this.isWeb3Locked){
+    // web3 is available but the wallet is locked
     return(
       <React.Fragment>
-        <Navbar walletStatus="" sendStatus="disabled"></Navbar>
-        <div className="container">
-          <h1>Hi</h1>
-          <p>{this.state.account}</p>
-          <p>{this.state.balance}</p>
+        <Navbar walletStatus="disabled" sendStatus="disabled"></Navbar>
+        <br></br>
+        <div className="row">
+          <div className="col-md-3"></div>
+          <div className="col-md-6">
+            <MetamaskComponent reason="web3locked"></MetamaskComponent>
+          </div>
+          <div className="col-md-3"></div>
+        </div>
+      </React.Fragment>
+    );
+    }else if(!this.isWeb3){
+    // web3 is not available
+    return(
+      <React.Fragment>
+        <Navbar walletStatus="disabled" sendStatus="disabled"></Navbar>
+        <br></br>
+        <div className="row">
+          <div className="col-md-3"></div>
+          <div className="col-md-6">
+            <MetamaskComponent reason="web3"></MetamaskComponent>
+          </div>
+          <div className="col-md-3"></div>
+        </div>
+      </React.Fragment>
+    );
+    }*/
+    return(
+      <React.Fragment>
+        <Navbar walletStatus="disabled" sendStatus="disabled"></Navbar>
+        <br></br>
+        <div className="row">
+          <div className="col-md-3"></div>
+          <div className="col-md-6">
+            <MetamaskComponent reason="web3locked"></MetamaskComponent>
+          </div>
+          <div className="col-md-3"></div>
         </div>
       </React.Fragment>
     );
   }
 }
-
 export default App;
