@@ -69,14 +69,15 @@ class App extends Component{
   }
 
   render(){
+    console.log(this.props.type);
     console.log(this.state);
     console.log(this.isWeb3);
     console.log(this.isWeb3Locked);
-    /*    if(this.isWeb3 && !this.isWeb3Locked){
+    if(this.isWeb3 && !this.isWeb3Locked){
     // web3 is available and also the wallet is unlocked
     return(
     <React.Fragment>
-    <Navbar walletStatus="" sendStatus="disabled"></Navbar>
+    <Navbar walletStatus="" sendStatus=""></Navbar>
     <div className="container">
     <h1>Hi</h1>
     <p>{this.state.account}</p>
@@ -114,20 +115,7 @@ class App extends Component{
         </div>
       </React.Fragment>
     );
-    }*/
-    return(
-      <React.Fragment>
-        <Navbar walletStatus="disabled" sendStatus="disabled"></Navbar>
-        <br></br>
-        <div className="row">
-          <div className="col-md-3"></div>
-          <div className="col-md-6">
-            <MetamaskComponent reason="web3locked"></MetamaskComponent>
-          </div>
-          <div className="col-md-3"></div>
-        </div>
-      </React.Fragment>
-    );
+    }
   }
 }
 export default App;

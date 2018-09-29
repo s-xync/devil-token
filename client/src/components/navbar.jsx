@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link, Route } from 'react-router-dom';
 
 class Navbar extends Component{
   render(){
@@ -6,10 +7,10 @@ class Navbar extends Component{
       <React.Fragment>
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
           <div className="container">
-            <a className="navbar-brand" href="/">DVTK</a>
+            <Link to="/"><div className="navbar-brand">DVTK</div></Link>
             <div className="navbar-nav ml-md-auto">
-              <a className={"nav-item nav-link "+this.props.walletStatus} href="/wallet">Wallet</a>
-              <a className={"nav-item nav-link "+this.props.sendStatus} href="/send">Send</a>
+              <Link to="/wallet"><div className={"nav-item nav-link "+this.props.walletStatus}>Wallet</div></Link>
+              <Link to="/send"><div className={"nav-item nav-link "+this.props.sendStatus}>Send</div></Link>
             </div>
           </div>
         </nav>
