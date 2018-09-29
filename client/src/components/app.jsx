@@ -4,7 +4,8 @@ import TruffleContract from 'truffle-contract';
 import DevilToken from '../contracts/DevilToken.json';
 import Navbar from './navbar.jsx';
 import NavMet from './navmet.jsx'
-
+import DetWall from './detwall.jsx'
+import DetSend from './detsend.jsx'
 //the contracts folder in the src folder is a symlink
 //to the original build/contracts in the truffle project
 
@@ -60,42 +61,41 @@ class App extends Component{
           this.web3.eth.getCoinbase((err,account)=>{
             this.devilToken.deployed().then((instance)=>{
               instance.balanceOf(account).then((balance)=>
-                this.setState({account:account,balance:balance.toNumber()})
-              );
-            });
+              this.setState({account:account,balance:balance.toNumber()})
+            );
           });
-        }
-      });
-    }
-  }//componentDidMount ends
+        });
+      }
+    });
+  }
+}//componentDidMount ends
 
-  render(){
-    console.log(this.props.type);
+render(){
+  console.log(this.props.type);
 
-    if(this.isWeb3 && !this.isWeb3Locked){
-      // web3 is available and also the wallet is unlocked
+  if(this.isWeb3 && !this.isWeb3Locked){
+    // web3 is available and also the wallet is unlocked
+    if(this.props.type==="wallet"){
       return(
-        <React.Fragment>
-          <Navbar walletStatus="" sendStatus=""></Navbar>
-          <div className="container">
-            <h1>Hi</h1>
-            <p>{this.state.account}</p>
-            <p>{this.state.balance}</p>
-          </div>
-        </React.Fragment>
+        <DetWall account={this.state.account} balance={this.state.balance}/>
       );
-    }else if(this.isWeb3 && this.isWeb3Locked){
-      // web3 is available but the wallet is locked
+    }else if(this.props.type==="send"){
       return(
-        <NavMet reason="web3locked"/>
-      );
-    }else if(!this.isWeb3){
-      // web3 is not available
-      return(
-        <NavMet reason="web3"/>
+        <DetSend account={this.state.account} balance={this.state.balance}/>
       );
     }
-  }//render ends
+  }else if(this.isWeb3 && this.isWeb3Locked){
+    // web3 is available but the wallet is locked
+    return(
+      <NavMet reason="web3locked"/>
+    );
+  }else if(!this.isWeb3){
+    // web3 is not available
+    return(
+      <NavMet reason="web3"/>
+    );
+  }
+}//render ends
 
 }
 

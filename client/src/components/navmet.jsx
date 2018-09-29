@@ -10,13 +10,15 @@ class NavMet extends Component{
     return(
       <React.Fragment>
         <Navbar walletStatus="disabled" sendStatus="disabled"></Navbar>
-        <br></br>
-        <div className="row">
-          <div className="col-md-3"></div>
-          <div className="col-md-6">
-            <MetamaskComponent reason={this.props.reason}></MetamaskComponent>
+        <div className="container">
+          <br></br>
+          <div className="row">
+            <div className="col-md-2"></div>
+            <div className="col-md-8">
+              <MetamaskComponent reason={this.props.reason}></MetamaskComponent>
+            </div>
+            <div className="col-md-2"></div>
           </div>
-          <div className="col-md-3"></div>
         </div>
       </React.Fragment>
     );
