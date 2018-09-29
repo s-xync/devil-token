@@ -13,10 +13,10 @@ class Details extends Component{
             <div className="col-md-2"><b>Balance:</b></div>
             <div className="col-md-10">{this.props.balance} <b>DVTK</b></div>
           </div>
-          </div>
-        </React.Fragment>
-      );
-    }
+        </div>
+      </React.Fragment>
+    );
   }
+}
 
-  export default Details;
+export default Details;

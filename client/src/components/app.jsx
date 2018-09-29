@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import Web3 from 'web3';
 import TruffleContract from 'truffle-contract';
 import DevilToken from '../contracts/DevilToken.json';
-import Navbar from './navbar.jsx';
-import NavMet from './navmet.jsx'
-import DetWall from './detwall.jsx'
-import DetSend from './detsend.jsx'
+import NavMet from './navmet.jsx';
+import DetWall from './detwall.jsx';
+import DetSend from './detsend.jsx';
 //the contracts folder in the src folder is a symlink
 //to the original build/contracts in the truffle project
 
@@ -60,43 +59,42 @@ class App extends Component{
         if(!this.isWeb3Locked){
           this.web3.eth.getCoinbase((err,account)=>{
             this.devilToken.deployed().then((instance)=>{
-              instance.balanceOf(account).then((balance)=>
-              this.setState({account:account,balance:balance.toNumber()})
-            );
+              instance.balanceOf(account).then((balance)=>{
+                this.setState({account:account,balance:balance.toNumber()});
+              });
+            });
           });
-        });
+        }
+      });
+    }
+  }//componentDidMount ends
+
+  render(){
+    if(this.isWeb3 && !this.isWeb3Locked){
+      // web3 is available and also the wallet is unlocked
+      if(this.props.type==="wallet"){
+        // nav, details, wallet
+        return(
+          <DetWall account={this.state.account} balance={this.state.balance}/>
+        );
+      }else if(this.props.type==="send"){
+        // nav, details, send
+        return(
+          <DetSend account={this.state.account} balance={this.state.balance}/>
+        );
       }
-    });
-  }
-}//componentDidMount ends
-
-render(){
-  console.log(this.props.type);
-
-  if(this.isWeb3 && !this.isWeb3Locked){
-    // web3 is available and also the wallet is unlocked
-    if(this.props.type==="wallet"){
+    }else if(this.isWeb3 && this.isWeb3Locked){
+      // web3 is available but the wallet is locked
       return(
-        <DetWall account={this.state.account} balance={this.state.balance}/>
+        <NavMet reason="web3locked"/>
       );
-    }else if(this.props.type==="send"){
+    }else if(!this.isWeb3){
+      // web3 is not available
       return(
-        <DetSend account={this.state.account} balance={this.state.balance}/>
+        <NavMet reason="web3"/>
       );
     }
-  }else if(this.isWeb3 && this.isWeb3Locked){
-    // web3 is available but the wallet is locked
-    return(
-      <NavMet reason="web3locked"/>
-    );
-  }else if(!this.isWeb3){
-    // web3 is not available
-    return(
-      <NavMet reason="web3"/>
-    );
-  }
-}//render ends
-
+  }//render ends
 }
 
 export default App;

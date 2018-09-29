@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import Navbar from './navbar.jsx';
-import Details from './details.jsx'
+import Details from './details.jsx';
 
 class DetSend extends Component{
   render(){
     return(
       <React.Fragment>
-        <Navbar walletStatus="" sendStatus="active"></Navbar>
+        <Navbar walletStatus="" sendStatus="active"/>
         <div className="container">
           <br></br>
           <div className="row">

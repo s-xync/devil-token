@@ -9,13 +9,13 @@ class NavMet extends Component{
   render(){
     return(
       <React.Fragment>
-        <Navbar walletStatus="disabled" sendStatus="disabled"></Navbar>
+        <Navbar walletStatus="disabled" sendStatus="disabled"/>
         <div className="container">
           <br></br>
           <div className="row">
             <div className="col-md-2"></div>
             <div className="col-md-8">
-              <MetamaskComponent reason={this.props.reason}></MetamaskComponent>
+              <MetamaskComponent reason={this.props.reason}/>
             </div>
             <div className="col-md-2"></div>
           </div>
