@@ -10,11 +10,9 @@ class App extends Component{
     super(props)
     this.state =
     {
-      details:{
         account:null,
         balance:0,
         network:0
-      }
     };
 
     this.isWeb3=true;
@@ -36,8 +34,7 @@ class App extends Component{
 
   componentDidMount(){
     if(this.isWeb3){
-      this.web3.version.getNetwork((err,_networkId)=>{
-        const networkId=_networkId;
+      this.web3.version.getNetwork((err,networkId)=>{
         let networkName;
         switch (networkId) {
           case "1":
@@ -58,21 +55,17 @@ class App extends Component{
           default:
           networkName = networkId.toString();
         }
-        let details={...this.state.details}
-        details.network=networkName;
+        this.setState({network:networkName})
         if(!this.isWeb3Locked){
-          this.web3.eth.getCoinbase((err,_account)=>{
-            const account=_account;
-            details.account=account;
+          this.web3.eth.getCoinbase((err,account)=>{
+            this.devilToken.deployed().then((instance)=>{
+              instance.balanceOf(account).then(balance=>this.setState({account:account,balance:balance.toNumber()}));
+            });
           });
         }
-        this.setState({details});
       });
     }
   }
-
-
-
 
   render(){
     console.log(this.state);
@@ -83,6 +76,8 @@ class App extends Component{
         <Navbar walletStatus="" sendStatus="disabled"></Navbar>
         <div className="container">
           <h1>Hi</h1>
+          <p>{this.state.account}</p>
+          <p>{this.state.balance}</p>
         </div>
       </React.Fragment>
     );

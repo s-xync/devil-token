@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 class Navbar extends Component{
   render(){
-    console.log(this.props.walletStatus,this.props.sendStatus);
     return(
       <React.Fragment>
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
