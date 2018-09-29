@@ -2,13 +2,16 @@ import React, { Component } from 'react';
 
 class Navbar extends Component{
   render(){
+    console.log(this.props.walletStatus,this.props.sendStatus);
     return(
       <React.Fragment>
-        <nav className="navbar navbar-expand-lg navbar-light bg-light">
-          <a className="navbar-brand" href="/">DVTK</a>
-          <div class="navbar-nav ml-md-auto">
-            <a class="nav-item nav-link active" href="/wallet">Wallet</a>
-            <a class="nav-item nav-link" href="/send">Send</a>
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+          <div className="container">
+            <a className="navbar-brand" href="/">DVTK</a>
+            <div className="navbar-nav ml-md-auto">
+              <a className={"nav-item nav-link "+this.props.walletStatus} href="/wallet">Wallet</a>
+              <a className={"nav-item nav-link "+this.props.sendStatus} href="/send">Send</a>
+            </div>
           </div>
         </nav>
       </React.Fragment>
