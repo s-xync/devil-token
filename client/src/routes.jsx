@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import {BrowserRouter,Route,Switch} from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import App from './components/app.jsx'
+
 class Routes extends Component{
   render(){
     return(
@@ -13,7 +14,7 @@ class Routes extends Component{
         </Switch>
       </BrowserRouter>
     );
-  }
+  }//render ends
 }
 
 export default Routes;

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link, Route } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 class Navbar extends Component{
   render(){
@@ -16,8 +16,7 @@ class Navbar extends Component{
         </nav>
       </React.Fragment>
     );
-  }
+  }//render ends
 }
-
 
 export default Navbar;

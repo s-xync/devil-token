@@ -3,12 +3,14 @@ import Web3 from 'web3';
 import TruffleContract from 'truffle-contract';
 import DevilToken from '../contracts/DevilToken.json';
 import Navbar from './navbar.jsx';
-import MetamaskComponent from './metamask.jsx'
+import NavMet from './navmet.jsx'
 
+//the contracts folder in the src folder is a symlink
+//to the original build/contracts in the truffle project
 
 class App extends Component{
-  constructor(props) {
-    super(props)
+  constructor(props){
+    super(props);
     this.state =
     {
       account:null,
@@ -18,7 +20,6 @@ class App extends Component{
 
     this.isWeb3=true;
     this.isWeb3Locked=false;
-
     const web3= window.web3;
     if (typeof web3 !== 'undefined') {
       this.web3Provider = web3.currentProvider;
@@ -29,9 +30,7 @@ class App extends Component{
     }else{
       this.isWeb3 = false;
     }
-  }
-
-
+  }//constructor ends
 
   componentDidMount(){
     if(this.isWeb3){
@@ -56,66 +55,48 @@ class App extends Component{
           default:
           networkName = networkId.toString();
         }
-        this.setState({network:networkName})
+        this.setState({network:networkName});
         if(!this.isWeb3Locked){
           this.web3.eth.getCoinbase((err,account)=>{
             this.devilToken.deployed().then((instance)=>{
-              instance.balanceOf(account).then(balance=>this.setState({account:account,balance:balance.toNumber()}));
+              instance.balanceOf(account).then((balance)=>
+                this.setState({account:account,balance:balance.toNumber()})
+              );
             });
           });
         }
       });
     }
-  }
+  }//componentDidMount ends
 
   render(){
     console.log(this.props.type);
-    console.log(this.state);
-    console.log(this.isWeb3);
-    console.log(this.isWeb3Locked);
+
     if(this.isWeb3 && !this.isWeb3Locked){
-    // web3 is available and also the wallet is unlocked
-    return(
-    <React.Fragment>
-    <Navbar walletStatus="" sendStatus=""></Navbar>
-    <div className="container">
-    <h1>Hi</h1>
-    <p>{this.state.account}</p>
-    <p>{this.state.balance}</p>
-    </div>
-    </React.Fragment>
-    );
+      // web3 is available and also the wallet is unlocked
+      return(
+        <React.Fragment>
+          <Navbar walletStatus="" sendStatus=""></Navbar>
+          <div className="container">
+            <h1>Hi</h1>
+            <p>{this.state.account}</p>
+            <p>{this.state.balance}</p>
+          </div>
+        </React.Fragment>
+      );
     }else if(this.isWeb3 && this.isWeb3Locked){
-    // web3 is available but the wallet is locked
-    return(
-      <React.Fragment>
-        <Navbar walletStatus="disabled" sendStatus="disabled"></Navbar>
-        <br></br>
-        <div className="row">
-          <div className="col-md-3"></div>
-          <div className="col-md-6">
-            <MetamaskComponent reason="web3locked"></MetamaskComponent>
-          </div>
-          <div className="col-md-3"></div>
-        </div>
-      </React.Fragment>
-    );
+      // web3 is available but the wallet is locked
+      return(
+        <NavMet reason="web3locked"/>
+      );
     }else if(!this.isWeb3){
-    // web3 is not available
-    return(
-      <React.Fragment>
-        <Navbar walletStatus="disabled" sendStatus="disabled"></Navbar>
-        <br></br>
-        <div className="row">
-          <div className="col-md-3"></div>
-          <div className="col-md-6">
-            <MetamaskComponent reason="web3"></MetamaskComponent>
-          </div>
-          <div className="col-md-3"></div>
-        </div>
-      </React.Fragment>
-    );
+      // web3 is not available
+      return(
+        <NavMet reason="web3"/>
+      );
     }
-  }
+  }//render ends
+
 }
+
 export default App;

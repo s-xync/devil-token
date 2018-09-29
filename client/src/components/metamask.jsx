@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+
 class MetamaskComponent extends Component{
   render(){
     if(this.props.reason==="web3"){
@@ -28,6 +29,7 @@ class MetamaskComponent extends Component{
         </React.Fragment>
       );
     }
-  }
+  }//render ends
 }
+
 export default MetamaskComponent;
