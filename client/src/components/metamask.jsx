@@ -7,7 +7,7 @@ class MetamaskComponent extends Component{
         <React.Fragment>
           <div className="jumbotron text-center">
             <h1 className="display-6">OOPS!</h1>
-            <h3 className="display-5">Could Not Find Web3!</h3>
+            <h3 className="display-5 overflow-text">Could Not Find Web3!</h3>
             <p className="lead">Please install the Metamask Chrome Extension.</p>
             <a href="https://metamask.io/" target="_blank" rel="noopener noreferrer">
               <img style={{maxWidth:'50%'}} className="img-fluid" src={require('../assets/metamask_install.png')} alt="metamask_install.png"/>
@@ -22,7 +22,7 @@ class MetamaskComponent extends Component{
         <React.Fragment>
           <div className="jumbotron text-center">
             <h1 className="display-6">OOPS!</h1>
-            <h3 className="display-5">Could Not Find a Web3 Account!</h3>
+            <h3 className="display-5 overflow-text">Could Not Find a Web3 Account!</h3>
             <p className="lead">Please unlock Metamask.</p>
             <a href="https://metamask.io/" target="_blank" rel="noopener noreferrer">
               <img style={{maxWidth:'20%'}} className="img-fluid" src={require('../assets/metamask_login.png')} alt="metamask_login.png"/>
