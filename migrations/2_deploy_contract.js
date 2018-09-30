@@ -1,5 +1,5 @@
-const DevilToken = artifacts.require("./DevilToken.sol");
+const TokenizeEverything = artifacts.require("./TokenizeEverything.sol");
 
 module.exports = (deployer) => {
-  deployer.deploy(DevilToken, "DevilToken", "DVTK", 5, 10000);
+  deployer.deploy(TokenizeEverything, "HelloToken", "HLTK", 6, 100000);
 };
