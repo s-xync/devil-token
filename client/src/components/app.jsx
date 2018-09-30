@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Web3 from 'web3';
 import TruffleContract from 'truffle-contract';
-import DevilToken from '../contracts/DevilToken.json';
+import TokenizeEverything from '../contracts/TokenizeEverything.json';
 import NavMet from './navmet.jsx';
 import DetWall from './detwall.jsx';
 import DetSend from './detsend.jsx';
@@ -46,8 +46,8 @@ class App extends Component{
     if (typeof web3 !== 'undefined') {
       this.web3Provider = web3.currentProvider;
       this.web3 = new Web3(web3.currentProvider);
-      this.devilToken = TruffleContract(DevilToken);
-      this.devilToken.setProvider(this.web3Provider);
+      this.tokenizeEverything = TruffleContract(TokenizeEverything);
+      this.tokenizeEverything.setProvider(this.web3Provider);
     }else{
       this.isWeb3 = false;
     }
@@ -77,7 +77,7 @@ class App extends Component{
   watchTokenTransferEvents(){
     if(this.isWeb3 && !this.state.isWeb3Locked){
       //the filter does not seem to work and so, we have to do our own filtering ):
-      this.devilToken.deployed().then((instance)=>{
+      this.tokenizeEverything.deployed().then((instance)=>{
         instance.Transfer({},{
           fromBlock:'0',//debug
           toBlock:'latest'
@@ -111,7 +111,7 @@ class App extends Component{
       this.web3.eth.getCoinbase((err,accountAddress)=>{
         if(accountAddress){
           this.setState({accountAddress:accountAddress});
-          this.devilToken.deployed().then((instance)=>{
+          this.tokenizeEverything.deployed().then((instance)=>{
             instance.balanceOf(accountAddress).then((accountBalance)=>{
               instance.decimals().then((decimals)=>this.setState({accountBalance:(accountBalance/(10**decimals.toNumber())).toString()}));
             });
@@ -148,7 +148,7 @@ class App extends Component{
         }
         this.setState({networkName:networkName});
       });
-      this.devilToken.deployed().then((instance)=>{
+      this.tokenizeEverything.deployed().then((instance)=>{
         instance.symbol().then((tokenSymbol)=>this.setState({tokenSymbol:tokenSymbol}));
         instance.decimals().then((tokenDecimalsBigNumber)=>this.setState({tokenDecimals:tokenDecimalsBigNumber.toNumber()}));
         return instance.address;
