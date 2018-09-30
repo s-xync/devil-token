@@ -61,8 +61,8 @@ class App extends Component{
   createNewTransaction(fromAddress,toAddress,sign,value,decimals,trxnHash,date){
     const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     let newTransaction={
-      from:fromAddress,
-      to:toAddress,
+      fromAddress:fromAddress,
+      toAddress:toAddress,
       value:((value.toNumber()*sign)/(10**decimals)).toString(),
       etherScanURL:"https://ropsten.etherscan.io/tx/"+trxnHash,
     };

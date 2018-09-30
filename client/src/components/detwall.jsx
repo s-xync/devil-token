@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Navbar from './navbar.jsx';
 import Details from './details.jsx';
-import Wallet from './wallet.jsx';
+import TransactionsTable from './transactions.jsx';
 
 class DetWall extends Component{
   render(){
@@ -19,11 +19,7 @@ class DetWall extends Component{
           </div>
           <br></br>
           <div className="row">
-            <div className="col-md-1"></div>
-            <div className="col-md-10">
-              <Wallet transactions={this.props.transactions}/>
-            </div>
-            <div className="col-md-1"></div>
+              <TransactionsTable transactions={this.props.transactions}/>
           </div>
         </div>
       </React.Fragment>
