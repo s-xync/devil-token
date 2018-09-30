@@ -21,7 +21,6 @@ class App extends Component{
       tokenDecimals:null,
       sendingTransactionHash:null,
       transactions:[]
-
     };
 
     //each transaction represents the below in the transactions array
@@ -33,7 +32,7 @@ class App extends Component{
     //  isWeb3 says if web3 is available
     // isWeb3Locked says if the wallet is locked
 
-    this.latestFirstEvent=false;
+    this.latestFirstEvent=false;//debug
     // we always have a latest first event that is always seen by our
     // application and we need to discard it as it may have happened long ago.
 
@@ -58,12 +57,12 @@ class App extends Component{
     this.watchTokenTransferEvents = this.watchTokenTransferEvents.bind(this)
   }//constructor ends
 
-  createNewTransaction(fromAddress,toAddress,sign,value,decimals,trxnHash,date){
+  createNewTransactionObject(fromAddress,toAddress,sign,value,decimals,trxnHash,date){
     const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     let newTransaction={
       fromAddress:fromAddress,
       toAddress:toAddress,
-      value:sign+(value.toNumber()/(10**decimals)).toString()+"DVTK",
+      value:sign+(value.toNumber()/(10**decimals)).toString(),
       etherScanURL:"https://ropsten.etherscan.io/tx/"+trxnHash,
     };
     let timeString="";
@@ -73,7 +72,7 @@ class App extends Component{
     timeString=timeString+" "+(hours%12===0?12:hours%12)+(hours>=12?"pm":"am"); // 0:34:05 26/10/2018 -> 12am
     newTransaction.timeString=timeString;
     return newTransaction;
-  }
+  }//createNewTransactionObject ends
 
   watchTokenTransferEvents(){
     if(this.isWeb3 && !this.state.isWeb3Locked){
@@ -88,11 +87,11 @@ class App extends Component{
           }else{
             if(this.latestFirstEvent){
               if(event.args.to===this.state.accountAddress){
-                const newTransaction=this.createNewTransaction(event.args.from,event.args.to,'+',event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
+                const newTransaction=this.createNewTransactionObject(event.args.from,event.args.to,'+',event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
                 this.setState({transactions:[newTransaction, ...this.state.transactions]});
                 this.getAccountDetails();
               }else if(event.args.from===this.state.accountAddress){
-                const newTransaction=this.createNewTransaction(event.args.from,event.args.to,'-',event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
+                const newTransaction=this.createNewTransactionObject(event.args.from,event.args.to,'-',event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
                 this.setState({transactions:[newTransaction, ...this.state.transactions]});
                 this.getAccountDetails();
               }else{
@@ -105,7 +104,7 @@ class App extends Component{
         });
       });
     }
-  }
+  }//watchTokenTransferEvents ends
 
   getAccountDetails(){
     if(this.isWeb3){

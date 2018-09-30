@@ -11,7 +11,7 @@ class Details extends Component{
           </div>
           <div className="row">
             <div className="col-md-3 overflow-text"><b>Balance:</b></div>
-            <div className="col-md-9 overflow-text">{this.props.accountBalance} <b>{this.props.tokenSymbol}</b></div>
+            <div className="col-md-9 overflow-text">{this.props.accountBalance} {this.props.tokenSymbol}</div>
           </div>
           <hr className="my-3"/>
           <p className="text-center overflow-text"><em><small className="text-muted">{this.props.networkName} : {this.props.tokenAddress}</small></em></p>

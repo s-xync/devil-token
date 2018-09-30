@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Navbar from './navbar.jsx';
-import MetamaskComponent from './metamask.jsx'
+import MetamaskComponent from './metamask.jsx';
 
 class NavMet extends Component{
   //this.props.reason will give the context

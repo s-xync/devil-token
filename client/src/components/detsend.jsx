@@ -6,7 +6,7 @@ class DetSend extends Component{
   render(){
     return(
       <React.Fragment>
-        <Navbar walletStatus="" sendStatus="active"/>
+        <Navbar walletStatus="" sendStatus="active" tokenSymbol={this.props.tokenSymbol}/>
         <div className="container">
           <br></br>
           <div className="row">

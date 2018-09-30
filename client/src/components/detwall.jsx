@@ -7,7 +7,7 @@ class DetWall extends Component{
   render(){
     return(
       <React.Fragment>
-        <Navbar walletStatus="active" sendStatus=""/>
+        <Navbar walletStatus="active" sendStatus="" tokenSymbol={this.props.tokenSymbol}/>
         <div className="container">
           <br></br>
           <div className="row">
@@ -19,7 +19,7 @@ class DetWall extends Component{
           </div>
           <br></br>
           <div className="row">
-              <TransactionsTable transactions={this.props.transactions}/>
+            <TransactionsTable transactions={this.props.transactions} tokenSymbol={this.props.tokenSymbol}/>
           </div>
         </div>
       </React.Fragment>
