@@ -53,7 +53,7 @@ class App extends Component{
       this.isWeb3 = false;
     }
 
-    this.setupAccountDetails = this.setupAccountDetails.bind(this)
+    this.getAccountDetails = this.getAccountDetails.bind(this)
     this.setupTokenAndNetworkDetails = this.setupTokenAndNetworkDetails.bind(this)
     this.watchTokenTransferEvents = this.watchTokenTransferEvents.bind(this)
   }//constructor ends
@@ -63,7 +63,7 @@ class App extends Component{
     let newTransaction={
       fromAddress:fromAddress,
       toAddress:toAddress,
-      value:((value.toNumber()*sign)/(10**decimals)).toString(),
+      value:sign+(value.toNumber()/(10**decimals)).toString()+"DVTK",
       etherScanURL:"https://ropsten.etherscan.io/tx/"+trxnHash,
     };
     let timeString="";
@@ -88,20 +88,18 @@ class App extends Component{
           }else{
             if(this.latestFirstEvent){
               if(event.args.to===this.state.accountAddress){
-                const newTransaction=this.createNewTransaction(event.args.from,event.args.to,1,event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
+                const newTransaction=this.createNewTransaction(event.args.from,event.args.to,'+',event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
                 this.setState({transactions:[newTransaction, ...this.state.transactions]});
+                this.getAccountDetails();
               }else if(event.args.from===this.state.accountAddress){
-                const newTransaction=this.createNewTransaction(event.args.from,event.args.to,-1,event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
+                const newTransaction=this.createNewTransaction(event.args.from,event.args.to,'-',event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
                 this.setState({transactions:[newTransaction, ...this.state.transactions]});
+                this.getAccountDetails();
               }else{
                 console.log("Someone just did a transaction where you are neither a sender nor a receiver!");
-                const newTransaction=this.createNewTransaction(event.args.from,event.args.to,-1,event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());//debug
-                this.setState({transactions:[newTransaction, ...this.state.transactions]});//debug
               }
             }else{
               this.latestFirstEvent=true;
-              const newTransaction=this.createNewTransaction(event.args.from,event.args.to,-1,event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());//debug
-              this.setState({transactions:[newTransaction, ...this.state.transactions]});//debug
             }
           }
         });
@@ -109,14 +107,14 @@ class App extends Component{
     }
   }
 
-  setupAccountDetails(){
+  getAccountDetails(){
     if(this.isWeb3){
       this.web3.eth.getCoinbase((err,accountAddress)=>{
         if(accountAddress){
           this.setState({accountAddress:accountAddress});
           this.devilToken.deployed().then((instance)=>{
             instance.balanceOf(accountAddress).then((accountBalance)=>{
-              instance.decimals().then((decimals)=>this.setState({accountBalance:accountBalance/(10**decimals.toNumber())}));
+              instance.decimals().then((decimals)=>this.setState({accountBalance:(accountBalance/(10**decimals.toNumber())).toString()}));
             });
           });
         }else{
@@ -124,7 +122,7 @@ class App extends Component{
         }
       });
     }
-  }//setupAccountDetails ends
+  }//getAccountDetails ends
 
   setupTokenAndNetworkDetails(){
     if(this.isWeb3){
@@ -160,13 +158,13 @@ class App extends Component{
   }//setupTokenAndNetworkDetails ends
 
   componentDidMount(){
-    this.setupAccountDetails();
+    this.getAccountDetails();
     this.setupTokenAndNetworkDetails();
     this.watchTokenTransferEvents();
   }//componentDidMount ends
 
   render(){
-    console.log(this.state.transactions);//debug
+    // console.log(this.state.transactions);//debug
     if(this.isWeb3 && !this.state.isWeb3Locked){
       // web3 is available and also the wallet is unlocked
       if(this.props.type==="wallet"){

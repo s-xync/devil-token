@@ -5,7 +5,7 @@ class TransactionsTable extends Component{
   render(){
     return(
       <React.Fragment>
-        <div className="jumbotron text-center" style={{paddingTop:'16px',paddingBottom:'8px',margin:'0px'}}>
+        <div className="jumbotron text-center" style={{width:'1140px',paddingTop:'16px',paddingBottom:'8px',margin:'0px'}}>
           <h4>Transactions</h4>
           <table className="table table-hover table-bordered">
             <thead className="thead-dark">
@@ -18,9 +18,6 @@ class TransactionsTable extends Component{
               </tr>
             </thead>
             <tbody>
-              {this.props.transactions.map((transaction)=><Transaction key={transaction.etherScanURL} transaction={transaction} />)}
-              {this.props.transactions.map((transaction)=><Transaction key={transaction.etherScanURL} transaction={transaction} />)}
-              {this.props.transactions.map((transaction)=><Transaction key={transaction.etherScanURL} transaction={transaction} />)}
               {this.props.transactions.map((transaction)=><Transaction key={transaction.etherScanURL} transaction={transaction} />)}
             </tbody>
           </table>
