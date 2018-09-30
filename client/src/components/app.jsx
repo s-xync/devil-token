@@ -13,9 +13,12 @@ class App extends Component{
     super(props);
     this.state =
     {
-      account:null,
-      balance:0,
-      network:0
+      accountAddress:null,
+      accountBalance:0,
+      networkName:null,
+      tokenAddress:null,
+      tokenSymbol:null,
+      tokenDecimals:0
     };
 
     this.isWeb3=true;
@@ -30,9 +33,26 @@ class App extends Component{
     }else{
       this.isWeb3 = false;
     }
+    this.setupAccountDetails = this.setupAccountDetails.bind(this)
+    this.setupTokenAndNetworkDetails = this.setupTokenAndNetworkDetails.bind(this)
+    // this.watchEvents = this.watchEvents.bind(this)
   }//constructor ends
 
-  componentDidMount(){
+  setupAccountDetails(){
+    if(this.isWeb3){
+      if(!this.isWeb3Locked){
+        this.web3.eth.getCoinbase((err,accountAddress)=>{
+          this.devilToken.deployed().then((instance)=>{
+            instance.balanceOf(accountAddress).then((accountBalance)=>{
+              this.setState({accountAddress:accountAddress,accountBalance:accountBalance.toNumber()});
+            });
+          });
+        });
+      }
+    }
+  }//setupAccountDetails ends
+
+  setupTokenAndNetworkDetails(){
     if(this.isWeb3){
       this.web3.version.getNetwork((err,networkId)=>{
         let networkName;
@@ -55,32 +75,37 @@ class App extends Component{
           default:
           networkName = networkId.toString();
         }
-        this.setState({network:networkName});
-        if(!this.isWeb3Locked){
-          this.web3.eth.getCoinbase((err,account)=>{
-            this.devilToken.deployed().then((instance)=>{
-              instance.balanceOf(account).then((balance)=>{
-                this.setState({account:account,balance:balance.toNumber()});
-              });
-            });
-          });
-        }
+        this.setState({networkName:networkName});
       });
+      if(!this.isWeb3Locked){
+        this.devilToken.deployed().then((instance)=>{
+          instance.symbol().then((symbol)=>this.setState({tokenSymbol:symbol}));
+          instance.decimals().then((decimals)=>this.setState({tokenDecimals:decimals.toNumber()}));
+          return instance.address;
+        }).then((tokenAddress)=>this.setState({tokenAddress:tokenAddress}));
+      }
     }
+  }//setupTokenAndNetworkDetails ends
+
+  componentDidMount(){
+    console.log("hre");
+    this.setupAccountDetails();
+    this.setupTokenAndNetworkDetails();
   }//componentDidMount ends
 
   render(){
+    console.log(this.state);
     if(this.isWeb3 && !this.isWeb3Locked){
       // web3 is available and also the wallet is unlocked
       if(this.props.type==="wallet"){
         // nav, details, wallet
         return(
-          <DetWall account={this.state.account} balance={this.state.balance}/>
+          <DetWall accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress}/>
         );
       }else if(this.props.type==="send"){
         // nav, details, send
         return(
-          <DetSend account={this.state.account} balance={this.state.balance}/>
+          <DetSend accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress}/>
         );
       }
     }else if(this.isWeb3 && this.isWeb3Locked){

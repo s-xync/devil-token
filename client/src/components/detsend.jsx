@@ -12,7 +12,7 @@ class DetSend extends Component{
           <div className="row">
             <div className="col-md-3"></div>
             <div className="col-md-6">
-              <Details account={this.props.account} balance={this.props.balance}/>
+              <Details accountAddress={this.props.accountAddress} accountBalance={this.props.accountBalance} tokenSymbol={this.props.tokenSymbol} networkName={this.props.networkName} tokenAddress={this.props.tokenAddress}/>
             </div>
             <div className="col-md-3"></div>
           </div>
