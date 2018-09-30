@@ -14,11 +14,11 @@ class App extends Component{
     this.state =
     {
       accountAddress:null,
-      accountBalance:0,
+      accountBalance:null,
       networkName:null,
       tokenAddress:null,
       tokenSymbol:null,
-      tokenDecimals:0
+      tokenDecimals:null
     };
 
     this.isWeb3=true;
@@ -29,10 +29,10 @@ class App extends Component{
       this.web3 = new Web3(web3.currentProvider);
       this.devilToken = TruffleContract(DevilToken);
       this.devilToken.setProvider(this.web3Provider);
-      if (web3.eth.coinbase === null) this.isWeb3Locked = true;
     }else{
       this.isWeb3 = false;
     }
+    
     this.setupAccountDetails = this.setupAccountDetails.bind(this)
     this.setupTokenAndNetworkDetails = this.setupTokenAndNetworkDetails.bind(this)
     // this.watchEvents = this.watchEvents.bind(this)
@@ -40,15 +40,17 @@ class App extends Component{
 
   setupAccountDetails(){
     if(this.isWeb3){
-      if(!this.isWeb3Locked){
-        this.web3.eth.getCoinbase((err,accountAddress)=>{
+      this.web3.eth.getCoinbase((err,accountAddress)=>{
+        if(accountAddress){
           this.devilToken.deployed().then((instance)=>{
             instance.balanceOf(accountAddress).then((accountBalance)=>{
               this.setState({accountAddress:accountAddress,accountBalance:accountBalance.toNumber()});
             });
           });
-        });
-      }
+        }else{
+          this.isWeb3Locked=true;
+        }
+      });
     }
   }//setupAccountDetails ends
 
@@ -77,24 +79,20 @@ class App extends Component{
         }
         this.setState({networkName:networkName});
       });
-      if(!this.isWeb3Locked){
-        this.devilToken.deployed().then((instance)=>{
-          instance.symbol().then((symbol)=>this.setState({tokenSymbol:symbol}));
-          instance.decimals().then((decimals)=>this.setState({tokenDecimals:decimals.toNumber()}));
-          return instance.address;
-        }).then((tokenAddress)=>this.setState({tokenAddress:tokenAddress}));
-      }
+      this.devilToken.deployed().then((instance)=>{
+        instance.symbol().then((symbol)=>this.setState({tokenSymbol:symbol}));
+        instance.decimals().then((decimals)=>this.setState({tokenDecimals:decimals.toNumber()}));
+        return instance.address;
+      }).then((tokenAddress)=>this.setState({tokenAddress:tokenAddress}));
     }
   }//setupTokenAndNetworkDetails ends
 
   componentDidMount(){
-    console.log("hre");
     this.setupAccountDetails();
     this.setupTokenAndNetworkDetails();
   }//componentDidMount ends
 
   render(){
-    console.log(this.state);
     if(this.isWeb3 && !this.isWeb3Locked){
       // web3 is available and also the wallet is unlocked
       if(this.props.type==="wallet"){
