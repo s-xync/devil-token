@@ -5,8 +5,8 @@ class TransactionsTable extends Component{
   render(){
     return(
       <React.Fragment>
-        <div className="jumbotron" style={{paddingTop:'16px',paddingBottom:'8px',margin:'0px'}}>
-          <h4 className="text-center">Transactions</h4>
+        <div className="jumbotron text-center" style={{paddingTop:'16px',paddingBottom:'8px',margin:'0px'}}>
+          <h4>Transactions</h4>
           <table className="table table-hover table-bordered">
             <thead className="thead-dark">
               <tr>
