@@ -13,16 +13,29 @@ class App extends Component{
     super(props);
     this.state =
     {
+      isWeb3Locked:false,
       accountAddress:null,
       accountBalance:null,
       networkName:null,
       tokenAddress:null,
       tokenSymbol:null,
-      tokenDecimals:null
+      tokenDecimals:null,
+      sendingTransactionHash:null,
+      transactions:{
+        //from,to,amount,time
+        //from is accountAddress -> amount is negative
+        //to is accountAddress -> amount is positive
+      }
     };
 
     this.isWeb3=true;
-    this.isWeb3Locked=false;
+    //  isWeb3 says if web3 is available
+    // isWeb3Locked says if the wallet is locked
+
+    this.latestFirstEvent=false;
+    // we always have a latest first event that is always seen by our
+    // application and we need to discard it as it may have happened long ago.
+    // TODO: https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
     const web3= window.web3;
     if (typeof web3 !== 'undefined') {
       this.web3Provider = web3.currentProvider;
@@ -32,23 +45,54 @@ class App extends Component{
     }else{
       this.isWeb3 = false;
     }
-    
+
     this.setupAccountDetails = this.setupAccountDetails.bind(this)
     this.setupTokenAndNetworkDetails = this.setupTokenAndNetworkDetails.bind(this)
-    // this.watchEvents = this.watchEvents.bind(this)
+    this.watchTokenTransferEvents = this.watchTokenTransferEvents.bind(this)
   }//constructor ends
 
+  watchTokenTransferEvents() {
+    //https://medium.com/pixelpoint/track-blockchain-transactions-like-a-boss-with-web3-js-c149045ca9bf
+
+    if(this.isWeb3 && !this.state.isWeb3Locked){
+      //the filter does not seem to work and so, we have to do our own filtering ):
+      this.devilToken.deployed().then((instance)=>{
+        instance.Transfer({},{
+          fromBlock:'latest',
+          toBlock:'latest'
+        }).watch((error,event)=>{
+          if(error){
+            console.log(error);
+          }else{
+            if(this.latestFirstEvent){
+              if(event.args.to===this.state.accountAddress){
+                console.log("to");
+              }else if(event.args.from===this.state.accountAddress){
+                console.log("from");
+              }else{
+                console.log("someone");
+              }
+            }else{
+              this.latestFirstEvent=true;
+            }
+          }
+        });
+      });
+    }
+  }
+  
   setupAccountDetails(){
     if(this.isWeb3){
       this.web3.eth.getCoinbase((err,accountAddress)=>{
         if(accountAddress){
+          this.setState({accountAddress:accountAddress});
           this.devilToken.deployed().then((instance)=>{
             instance.balanceOf(accountAddress).then((accountBalance)=>{
-              this.setState({accountAddress:accountAddress,accountBalance:accountBalance.toNumber()});
+              this.setState({accountBalance:accountBalance.toNumber()});
             });
           });
         }else{
-          this.isWeb3Locked=true;
+          this.setState({isWeb3Locked:true});
         }
       });
     }
@@ -80,8 +124,8 @@ class App extends Component{
         this.setState({networkName:networkName});
       });
       this.devilToken.deployed().then((instance)=>{
-        instance.symbol().then((symbol)=>this.setState({tokenSymbol:symbol}));
-        instance.decimals().then((decimals)=>this.setState({tokenDecimals:decimals.toNumber()}));
+        instance.symbol().then((tokenSymbol)=>this.setState({tokenSymbol:tokenSymbol}));
+        instance.decimals().then((tokenDecimalsBigNumber)=>this.setState({tokenDecimals:tokenDecimalsBigNumber.toNumber()}));
         return instance.address;
       }).then((tokenAddress)=>this.setState({tokenAddress:tokenAddress}));
     }
@@ -90,10 +134,11 @@ class App extends Component{
   componentDidMount(){
     this.setupAccountDetails();
     this.setupTokenAndNetworkDetails();
+    this.watchTokenTransferEvents();
   }//componentDidMount ends
 
   render(){
-    if(this.isWeb3 && !this.isWeb3Locked){
+    if(this.isWeb3 && !this.state.isWeb3Locked){
       // web3 is available and also the wallet is unlocked
       if(this.props.type==="wallet"){
         // nav, details, wallet
@@ -106,7 +151,7 @@ class App extends Component{
           <DetSend accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress}/>
         );
       }
-    }else if(this.isWeb3 && this.isWeb3Locked){
+    }else if(this.isWeb3 && this.state.isWeb3Locked){
       // web3 is available but the wallet is locked
       return(
         <NavMet reason="web3locked"/>
