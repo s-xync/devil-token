@@ -11,8 +11,7 @@ import DetSend from './detsend.jsx';
 class App extends Component{
   constructor(props){
     super(props);
-    this.state =
-    {
+    this.state = {
       isWeb3Locked:false,
       accountAddress:null,
       accountBalance:null,
@@ -21,12 +20,14 @@ class App extends Component{
       tokenSymbol:null,
       tokenDecimals:null,
       sendingTransactionHash:null,
-      transactions:{
-        //from,to,amount,time
-        //from is accountAddress -> amount is negative
-        //to is accountAddress -> amount is positive
-      }
+      transactions:[]
+
     };
+
+    //each transaction represents the below in the transactions array
+    //from,to,value,timeString,etherScanURL
+    //if from is accountAddress -> value is negative
+    //if to is accountAddress -> value is positive
 
     this.isWeb3=true;
     //  isWeb3 says if web3 is available
@@ -35,7 +36,13 @@ class App extends Component{
     this.latestFirstEvent=false;
     // we always have a latest first event that is always seen by our
     // application and we need to discard it as it may have happened long ago.
+
+    /*
     // TODO: https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
+    // TODO: https://medium.com/pixelpoint/track-blockchain-transactions-like-a-boss-with-web3-js-c149045ca9bf
+    // TODO: https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#events
+    */
+
     const web3= window.web3;
     if (typeof web3 !== 'undefined') {
       this.web3Provider = web3.currentProvider;
@@ -51,14 +58,29 @@ class App extends Component{
     this.watchTokenTransferEvents = this.watchTokenTransferEvents.bind(this)
   }//constructor ends
 
-  watchTokenTransferEvents() {
-    //https://medium.com/pixelpoint/track-blockchain-transactions-like-a-boss-with-web3-js-c149045ca9bf
+  createNewTransaction(fromAddress,toAddress,sign,value,decimals,trxnHash,date){
+    const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    let newTransaction={
+      from:fromAddress,
+      to:toAddress,
+      value:((value.toNumber()*sign)/(10**decimals)).toString(),
+      etherScanURL:"https://ropsten.etherscan.io/tx/"+trxnHash,
+    };
+    let timeString="";
+    timeString=timeString+date.getDate(); // 16:34:05 26/10/2018 -> 26
+    timeString=timeString+" "+months[date.getMonth()-1]; // 16:34:05 26/10/2018 -> 10 -> Oct
+    const hours=date.getHours();
+    timeString=timeString+" "+(hours%12===0?12:hours%12)+(hours>=12?"pm":"am"); // 0:34:05 26/10/2018 -> 12am
+    newTransaction.timeString=timeString;
+    return newTransaction;
+  }
 
+  watchTokenTransferEvents(){
     if(this.isWeb3 && !this.state.isWeb3Locked){
       //the filter does not seem to work and so, we have to do our own filtering ):
       this.devilToken.deployed().then((instance)=>{
         instance.Transfer({},{
-          fromBlock:'latest',
+          fromBlock:'0',//debug
           toBlock:'latest'
         }).watch((error,event)=>{
           if(error){
@@ -66,21 +88,27 @@ class App extends Component{
           }else{
             if(this.latestFirstEvent){
               if(event.args.to===this.state.accountAddress){
-                console.log("to");
+                const newTransaction=this.createNewTransaction(event.args.from,event.args.to,1,event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
+                this.setState({transactions:[newTransaction, ...this.state.transactions]});
               }else if(event.args.from===this.state.accountAddress){
-                console.log("from");
+                const newTransaction=this.createNewTransaction(event.args.from,event.args.to,-1,event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
+                this.setState({transactions:[newTransaction, ...this.state.transactions]});
               }else{
-                console.log("someone");
+                console.log("Someone just did a transaction where you are neither a sender nor a receiver!");
+                const newTransaction=this.createNewTransaction(event.args.from,event.args.to,-1,event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());//debug
+                this.setState({transactions:[newTransaction, ...this.state.transactions]});//debug
               }
             }else{
               this.latestFirstEvent=true;
+              const newTransaction=this.createNewTransaction(event.args.from,event.args.to,-1,event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());//debug
+              this.setState({transactions:[newTransaction, ...this.state.transactions]});//debug
             }
           }
         });
       });
     }
   }
-  
+
   setupAccountDetails(){
     if(this.isWeb3){
       this.web3.eth.getCoinbase((err,accountAddress)=>{
@@ -88,7 +116,7 @@ class App extends Component{
           this.setState({accountAddress:accountAddress});
           this.devilToken.deployed().then((instance)=>{
             instance.balanceOf(accountAddress).then((accountBalance)=>{
-              this.setState({accountBalance:accountBalance.toNumber()});
+              instance.decimals().then((decimals)=>this.setState({accountBalance:accountBalance/(10**decimals.toNumber())}));
             });
           });
         }else{
@@ -138,12 +166,13 @@ class App extends Component{
   }//componentDidMount ends
 
   render(){
+    console.log(this.state.transactions);//debug
     if(this.isWeb3 && !this.state.isWeb3Locked){
       // web3 is available and also the wallet is unlocked
       if(this.props.type==="wallet"){
         // nav, details, wallet
         return(
-          <DetWall accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress}/>
+          <DetWall accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress} transactions={this.state.transactions}/>
         );
       }else if(this.props.type==="send"){
         // nav, details, send
