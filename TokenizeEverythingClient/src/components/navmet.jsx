@@ -9,7 +9,7 @@ class NavMet extends Component{
   render(){
     return(
       <React.Fragment>
-        <Navbar walletStatus="disabled" sendStatus="disabled"/>
+        <Navbar walletStatus="disabled" sendStatus="disabled" tokenName={this.props.tokenName} tokenSymbol={this.props.tokenSymbol}/>
         <div className="container">
           <br></br>
           <div className="row">

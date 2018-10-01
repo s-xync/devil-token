@@ -18,6 +18,7 @@ class App extends Component{
       networkName:null,
       tokenAddress:null,
       tokenSymbol:null,
+      tokenName:null,
       tokenDecimals:null,
       sendingTransactionHash:null,
       transactions:[]
@@ -150,6 +151,7 @@ class App extends Component{
       });
       this.tokenizeEverything.deployed().then((instance)=>{
         instance.symbol().then((tokenSymbol)=>this.setState({tokenSymbol:tokenSymbol}));
+        instance.name().then((tokenName)=>this.setState({tokenName:tokenName}));
         instance.decimals().then((tokenDecimalsBigNumber)=>this.setState({tokenDecimals:tokenDecimalsBigNumber.toNumber()}));
         return instance.address;
       }).then((tokenAddress)=>this.setState({tokenAddress:tokenAddress}));
@@ -169,18 +171,18 @@ class App extends Component{
       if(this.props.type==="wallet"){
         // nav, details, wallet
         return(
-          <DetWall accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress} transactions={this.state.transactions}/>
+          <DetWall accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress} tokenName={this.state.tokenName} transactions={this.state.transactions}/>
         );
       }else if(this.props.type==="send"){
         // nav, details, send
         return(
-          <DetSend accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress}/>
+          <DetSend accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress} tokenName={this.state.tokenName}/>
         );
       }
     }else if(this.isWeb3 && this.state.isWeb3Locked){
       // web3 is available but the wallet is locked
       return(
-        <NavMet reason="web3locked"/>
+        <NavMet reason="web3locked" tokenSymbol={this.state.tokenSymbol} tokenName={this.state.tokenName}/>
       );
     }else if(!this.isWeb3){
       // web3 is not available
