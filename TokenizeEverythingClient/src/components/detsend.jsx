@@ -18,13 +18,13 @@ class DetSend extends Component{
             <div className="col-md-3"></div>
           </div>
           <br></br>
-            <div className="row">
-              <div className="col-md-2"></div>
-              <div className="col-md-8">
-                <Transfer accountAddress={this.props.accountAddress} accountBalance={this.props.accountBalance} tokenSymbol={this.props.tokenSymbol} tokenDecimals={this.props.tokenDecimals} tokenizeEverything={this.props.tokenizeEverything}/>
-              </div>
-              <div className="col-md-2"></div>
+          <div className="row">
+            <div className="col-md-2"></div>
+            <div className="col-md-8">
+              <Transfer accountAddress={this.props.accountAddress} accountBalance={this.props.accountBalance} tokenSymbol={this.props.tokenSymbol} tokenDecimals={this.props.tokenDecimals} tokenizeEverything={this.props.tokenizeEverything}/>
             </div>
+            <div className="col-md-2"></div>
+          </div>
         </div>
       </React.Fragment>
     );

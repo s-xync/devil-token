@@ -24,7 +24,7 @@ class App extends Component{
     };
 
     //each transaction represents the below in the transactions array
-    //from,to,value,timeString,etherScanURL
+    //from,to,value,timeString,trxnHash
     //if from is accountAddress -> value is negative
     //if to is accountAddress -> value is positive
 
@@ -56,20 +56,6 @@ class App extends Component{
     this.setupTokenAndNetworkDetails = this.setupTokenAndNetworkDetails.bind(this);
     this.watchTokenTransferEvents = this.watchTokenTransferEvents.bind(this);
   }//constructor ends
-
-  // handleTransfer(toAddress,amount){//fires when send button is pressed
-  //   if(toAddress && amount){
-  //     if(toAddress[0]==='0' &&toAddress[1]==='x'&& toAddress.length===42 && amount>0 && amount<=parseFloat(this.state.accountBalance)){//checking second time just because I can ;)
-  //       this.tokenizeEverything.deployed().then((instance)=>{
-  //         instance.transfer(toAddress,amount*10**this.state.tokenDecimals,{from:this.state.accountAddress}).then((transaction)=>{
-  //           this.setState({sendingTransactionHash:transaction.tx});
-  //         }).catch((error)=>{
-  //           this.setState({sendingTransactionError:error});
-  //         })
-  //       })
-  //     }
-  //   }
-  // }
 
   createNewTransactionObject(fromAddress,toAddress,sign,value,decimals,trxnHash,date){
     const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -186,7 +172,6 @@ class App extends Component{
           <DetWall accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress} tokenName={this.state.tokenName} transactions={this.state.transactions}/>
         );
       }else if(this.props.type==="send"){
-        //TODO: set the sendingTransactionHash,sendingTransactionError,sendingTransactionConfirmed to null
         // nav, details, send
         return(
           <DetSend accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} tokenDecimals={this.state.tokenDecimals} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress} tokenName={this.state.tokenName} tokenizeEverything={this.tokenizeEverything}/>
