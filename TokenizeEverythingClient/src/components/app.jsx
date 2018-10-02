@@ -36,7 +36,7 @@ class App extends Component{
     //  isWeb3 says if web3 is available
     // isWeb3Locked says if the wallet is locked
 
-    this.latestFirstEvent=false;//debug normally has to be set to false
+    this.latestFirstEvent=true;//debug normally has to be set to false
     // we always have a latest first event that is always seen by our
     // application and we need to discard it as it may have happened long ago.
 
@@ -139,23 +139,17 @@ class App extends Component{
       this.web3.version.getNetwork((err,networkId)=>{
         let networkName;
         switch (networkId) {
-          case "1":
-          networkName = "Main";
-          break;
-          case "2":
-          networkName = "Morden";
-          break;
           case "3":
           networkName = "Ropsten";
-          break;
-          case "4":
-          networkName = "Rinkeby";
-          break;
-          case "42":
-          networkName = "Kovan";
+          this.latestFirstEvent=true;
           break;
           default:
           networkName = networkId.toString();
+          this.latestFirstEvent=false;
+          // in local network, we are getting the last available event
+          //everytime we call the watching function which is not a problem
+          //in ropsten and so, to discard that first event, we are using this
+          //variable latestFirstEvent
         }
         this.setState({networkName:networkName});
       });

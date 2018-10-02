@@ -12,18 +12,21 @@ class Transfer extends Component{
     transferableAmount:false,
     sendingTransactionHash:null,
     sendingTransactionError:null,
-    sendingTransactionConfirmed:null
+    sendingTransactionConfirmed:null,
+    isLoading:false,
+    _mounted:false
   };
 
   handleTransfer=(toAddress,amount)=>{//fires when send button is pressed
     if(toAddress && amount){//checking second time just because I can ;)
       if(toAddress[0]==='0' && toAddress[1]==='x'&& toAddress.length===42 && amount>0 && amount<=parseFloat(this.props.accountBalance)){
         this.props.tokenizeEverything.deployed().then((instance)=>{
+          this.setState({isLoading:true});
           instance.transfer(toAddress,amount*10**this.props.tokenDecimals,{from:this.props.accountAddress}).then((transaction)=>{
-            this.setState({sendingTransactionHash:transaction.tx});
+            if(this.state._mounted){this.setState({sendingTransactionHash:transaction.tx,isLoading:false});}
           }).catch((error)=>{
             console.log(error);
-            this.setState({sendingTransactionError:error});
+            if(this.state._mounted){this.setState({sendingTransactionError:error,isLoading:false});}
           });
         });
       }
@@ -100,20 +103,42 @@ class Transfer extends Component{
           console.log(error);
         }else{
           if(event.transactionHash===this.state.sendingTransactionHash){
-            this.setState({sendingTransactionConfirmed:true});
+            if(this.state._mounted){this.setState({sendingTransactionConfirmed:true});}
           }
         }
       });
     });
   }//watchTransactionConfirmatrion ends
 
+
   componentDidMount(){
+    this.setState({_mounted:true});
     this.watchTransactionConfirmatrion();
   }//componentDidMount ends
-
+  componentWillUnmount(){
+    this.setState({_mounted:false});
+    this.props.tokenizeEverything.deployed().then((instance)=>{
+      instance.allEvents({},{
+        fromBlock:'latest',
+        toBlock:'latest'
+      }).stopWatching();
+    });
+  }
   render(){
-    if(this.state.sendingTransactionHash || this.state.sendingTransactionError){
-      if(this.state.sendingTransactionHash){
+    if(this.state.isLoading || this.state.sendingTransactionHash || this.state.sendingTransactionError){
+      if(this.state.isLoading){//transaction hash not returned yet rendering
+        return(
+          <React.Fragment>
+            <div className="jumbotron" style={{paddingTop:'24px',paddingBottom:'16px'}}>
+              <h4 className="text-center">Send {this.props.tokenSymbol}</h4>
+              <hr className="my-4"/>
+              <img className="img-fluid" style={{display:"block",marginLeft:"auto",marginRight:"auto"}} src={require('../assets/loading.svg')} alt="loading.svg"/>
+              <br></br>
+              <h5 className="text-center">Sending Transaction In Progress...</h5>
+            </div>
+          </React.Fragment>
+        );//transaction hash not returned yet rendering ends
+      }else if(this.state.sendingTransactionHash){
         if(this.state.sendingTransactionConfirmed){//transaction confirmed rendering
           return(
             <React.Fragment>
@@ -135,7 +160,7 @@ class Transfer extends Component{
                 </div>
               </div>
             </React.Fragment>
-          );//transaction confirmed rendering
+          );//transaction confirmed rendering ends
         }else{//transaction not confirmed yet rendering
           return(
             <React.Fragment>
@@ -155,7 +180,7 @@ class Transfer extends Component{
                 </div>
               </div>
             </React.Fragment>
-          );//transaction not confirmed yet rendering
+          );//transaction not confirmed yet rendering ends
         }
       }else if(this.state.sendingTransactionError){//transaction was unsuccessful rendering
         return(
