@@ -112,7 +112,6 @@ class Transfer extends Component{
   }//componentDidMount ends
 
   render(){
-    console.log(this.state);
     if(this.state.sendingTransactionHash || this.state.sendingTransactionError){
       if(this.state.sendingTransactionHash){
         if(this.state.sendingTransactionConfirmed){//transaction confirmed rendering
