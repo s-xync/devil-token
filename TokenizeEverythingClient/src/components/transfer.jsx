@@ -71,7 +71,7 @@ class Transfer extends Component{
     if(this.state.transferableAddress&&this.state.transferableAmount){
       this.handleTransfer(this.state.inputAddress,parseFloat(this.state.inputAmount));
     }
-  }handleSubmitTransaction ends
+  }//handleSubmitTransaction ends
 
   handleCreateNewTransaction=(event)=>{
     event.preventDefault();
@@ -88,7 +88,28 @@ class Transfer extends Component{
       sendingTransactionError:null,
       sendingTransactionConfirmed:null
     });
-  }handleCreateNewTransaction ends
+  }//handleCreateNewTransaction ends
+
+  watchTransactionConfirmatrion=()=>{
+    this.props.tokenizeEverything.deployed().then((instance)=>{
+      instance.Transfer({},{
+        fromBlock:'latest',
+        toBlock:'latest'
+      }).watch((error,event)=>{
+        if(error){
+          console.log(error);
+        }else{
+          if(event.transactionHash===this.state.sendingTransactionHash){
+            this.setState({sendingTransactionConfirmed:true});
+          }
+        }
+      });
+    });
+  }//watchTransactionConfirmatrion ends
+
+  componentDidMount(){
+    this.watchTransactionConfirmatrion();
+  }//componentDidMount ends
 
   render(){
     console.log(this.state);
