@@ -22,11 +22,15 @@ class App extends Component{
       tokenDecimals:null,
       transactions:[]
     };
-
     //each transaction represents the below in the transactions array
     //from,to,value,timeString,trxnHash
     //if from is accountAddress -> value is negative
     //if to is accountAddress -> value is positive
+
+    this.expiryTime=1440; //minutes 24*60=1440min
+    //localStorage data older than one day will not be used
+    //instead the logs will be traversed again and transactions array is built
+
 
     this.isWeb3=true;
     //  isWeb3 says if web3 is available
@@ -55,16 +59,25 @@ class App extends Component{
     this.getAccountDetails = this.getAccountDetails.bind(this);
     this.setupTokenAndNetworkDetails = this.setupTokenAndNetworkDetails.bind(this);
     this.watchTokenTransferEvents = this.watchTokenTransferEvents.bind(this);
+    this.storeTransactionsLocally=this.storeTransactionsLocally.bind(this);
+    this.getTransactionsLocally=this.getTransactionsLocally.bind(this);
+    this.setupTransactions = this.setupTransactions.bind(this);
   }//constructor ends
 
-  createNewTransactionObject(fromAddress,toAddress,sign,value,decimals,trxnHash,date){
+  createNewTransactionObject(fromAddress,toAddress,accountAddress,value,decimals,trxnHash,date){
     const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     let newTransaction={
       fromAddress:fromAddress,
       toAddress:toAddress,
-      value:sign+(value.toNumber()/(10**decimals)).toString(),
-      trxnHash:trxnHash,
+      trxnHash:trxnHash
     };
+    let sign="";
+    if(fromAddress===accountAddress){
+      sign="-";
+    }else if(toAddress===accountAddress){
+      sign="+";
+    }
+    newTransaction.value=sign+(value.toNumber()/(10**decimals)).toString();
     let timeString="";
     timeString=timeString+date.getDate(); // 16:34:05 26/10/2018 -> 26
     timeString=timeString+" "+months[date.getMonth()-1]; // 16:34:05 26/10/2018 -> 10 -> Oct
@@ -79,19 +92,15 @@ class App extends Component{
       //the filter does not seem to work and so, we have to do our own filtering ):
       this.tokenizeEverything.deployed().then((instance)=>{
         instance.Transfer({},{
-          fromBlock:'0',//debug
+          fromBlock:'latest',//debug
           toBlock:'latest'
         }).watch((error,event)=>{
           if(error){
             console.log(error);
           }else{
             if(this.latestFirstEvent){
-              if(event.args.to===this.state.accountAddress){
-                const newTransaction=this.createNewTransactionObject(event.args.from,event.args.to,'+',event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
-                this.setState({transactions:[newTransaction, ...this.state.transactions]});
-                this.getAccountDetails();
-              }else if(event.args.from===this.state.accountAddress){
-                const newTransaction=this.createNewTransactionObject(event.args.from,event.args.to,'-',event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
+              if(event.args.to===this.state.accountAddress || event.args.from===this.state.accountAddress){
+                const newTransaction=this.createNewTransactionObject(event.args.from,event.args.to,this.state.accountAddress,event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
                 this.setState({transactions:[newTransaction, ...this.state.transactions]});
                 this.getAccountDetails();
               }else{
@@ -105,6 +114,8 @@ class App extends Component{
       });
     }
   }//watchTokenTransferEvents ends
+
+
 
   getAccountDetails(){
     if(this.isWeb3){
@@ -160,8 +171,87 @@ class App extends Component{
   componentDidMount(){
     this.getAccountDetails();
     this.setupTokenAndNetworkDetails();
+    this.getTransactionsLocally();
     this.watchTokenTransferEvents();
+    // event listener to call storeTransactionsLocally to when user leaves/refreshes the page
+    window.addEventListener("beforeunload",this.storeTransactionsLocally);
   }//componentDidMount ends
+
+  componentWillUnmount() {
+    window.removeEventListener("beforeunload",this.storeTransactionsLocally);
+    // saves if component has a chance to unmount
+    this.storeTransactionsLocally();
+  }//componentWillUnmount ends
+
+  setupTransactions(){
+    console.log("Fresh setup of transactions!");//debug
+    if(this.isWeb3){
+      this.web3.eth.getCoinbase((err,accountAddress)=>{
+        this.tokenizeEverything.deployed().then((instance)=>{
+          const transferEvent=instance.Transfer({},{fromBlock:'0',toBlock:'latest'});
+          transferEvent.get((error,logs)=>{
+            if(error){
+              console.log(error);
+            }else{
+              let transactions=[]
+              for(const event of logs){
+                if(event.args.to===accountAddress || event.args.from===accountAddress){
+                  const newTransaction=this.createNewTransactionObject(event.args.from,event.args.to,accountAddress,event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
+                  transactions.unshift(newTransaction);
+                }
+              }
+              this.setState({transactions:transactions});
+            }
+          });
+        });
+      });
+    }
+  }//setupTransactions ends
+
+  getTransactionsLocally(){
+    if(this.isWeb3){
+      this.web3.eth.getCoinbase((err,accountAddress)=>{
+        this.tokenizeEverything.deployed().then((instance)=>{
+          return instance.address;
+        }).then((tokenAddress)=>{
+          if(accountAddress && tokenAddress){
+            let localTransactions=localStorage.getItem("Transactions "+this.state.accountAddress+this.state.tokenAddress);
+            let localTransactionsDate=new Date(parseInt(localStorage.getItem("Transactions "+this.state.accountAddress+this.state.tokenAddress+" Date"),10))
+            let now=new Date()
+            if(localTransactions && localTransactionsDate){
+              let timeElapsed=Math.round((now-localTransactionsDate)/(1000*60)) //minutes
+              if(timeElapsed<this.expiryTime){
+                //old data
+                //expiryTime is defined in the constructor
+                this.setState({transactions:JSON.parse(localTransactions)})
+              }else{
+                this.setupTransactions()
+              }
+            }else{
+              this.setupTransactions()
+            }
+          }
+        });
+      });
+    }
+  }//getTransactionsLocally ends
+
+  storeTransactionsLocally(){
+    //localStorage key->accountAddress+tokenAddress value->transactions
+    //localStorage key->accountAddress+tokenAddress+Date value->date
+    if(this.isWeb3){
+      this.web3.eth.getCoinbase((err,accountAddress)=>{
+        this.tokenizeEverything.deployed().then((instance)=>{
+          return instance.address;
+        }).then((tokenAddress)=>{
+          if(accountAddress && tokenAddress){
+            localStorage.setItem("Transactions "+this.state.accountAddress+this.state.tokenAddress,JSON.stringify(this.state.transactions));
+            localStorage.setItem("Transactions "+this.state.accountAddress+this.state.tokenAddress+" Date", Date.now());
+          }
+        });
+      });
+    }
+  }//storeTransactionsLocally ends
 
   render(){
     if(this.isWeb3 && !this.state.isWeb3Locked){
