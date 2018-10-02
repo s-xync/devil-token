@@ -35,7 +35,7 @@ class App extends Component{
     //  isWeb3 says if web3 is available
     // isWeb3Locked says if the wallet is locked
 
-    this.latestFirstEvent=true;//debug normally has to be set to false
+    this.latestFirstEvent=false;//debug normally has to be set to false
     // we always have a latest first event that is always seen by our
     // application and we need to discard it as it may have happened long ago.
 
