@@ -21,6 +21,8 @@ class App extends Component{
       tokenName:null,
       tokenDecimals:null,
       sendingTransactionHash:null,
+      sendingTransactionError:null,
+      sendingTransactionConfirmed:null,
       transactions:[]
     };
 
@@ -33,7 +35,7 @@ class App extends Component{
     //  isWeb3 says if web3 is available
     // isWeb3Locked says if the wallet is locked
 
-    this.latestFirstEvent=false;//debug
+    this.latestFirstEvent=true;//debug normally has to be set to false
     // we always have a latest first event that is always seen by our
     // application and we need to discard it as it may have happened long ago.
 
@@ -53,10 +55,25 @@ class App extends Component{
       this.isWeb3 = false;
     }
 
-    this.getAccountDetails = this.getAccountDetails.bind(this)
-    this.setupTokenAndNetworkDetails = this.setupTokenAndNetworkDetails.bind(this)
-    this.watchTokenTransferEvents = this.watchTokenTransferEvents.bind(this)
+    this.getAccountDetails = this.getAccountDetails.bind(this);
+    this.setupTokenAndNetworkDetails = this.setupTokenAndNetworkDetails.bind(this);
+    this.watchTokenTransferEvents = this.watchTokenTransferEvents.bind(this);
+    this.handleTransfer=this.handleTransfer.bind(this);
   }//constructor ends
+
+  handleTransfer(toAddress,amount){//fires when send button is pressed
+    if(toAddress && amount){
+      if(toAddress[0]==='0' &&toAddress[1]==='x'&& toAddress.length===42 && amount>0 && amount<=parseFloat(this.state.accountBalance)){//checking second time just because I can ;)
+        this.tokenizeEverything.deployed().then((instance)=>{
+          instance.transfer(toAddress,amount*10**this.state.tokenDecimals,{from:this.state.accountAddress}).then((transaction)=>{
+            this.setState({sendingTransactionHash:transaction.tx});
+          }).catch((error)=>{
+            this.setState({sendingTransactionError:error});
+          })
+        })
+      }
+    }
+  }
 
   createNewTransactionObject(fromAddress,toAddress,sign,value,decimals,trxnHash,date){
     const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -64,7 +81,7 @@ class App extends Component{
       fromAddress:fromAddress,
       toAddress:toAddress,
       value:sign+(value.toNumber()/(10**decimals)).toString(),
-      etherScanURL:"https://ropsten.etherscan.io/tx/"+trxnHash,
+      trxnHash:trxnHash,
     };
     let timeString="";
     timeString=timeString+date.getDate(); // 16:34:05 26/10/2018 -> 26
@@ -94,6 +111,9 @@ class App extends Component{
               }else if(event.args.from===this.state.accountAddress){
                 const newTransaction=this.createNewTransactionObject(event.args.from,event.args.to,'-',event.args.value,this.state.tokenDecimals,event.transactionHash,new Date());
                 this.setState({transactions:[newTransaction, ...this.state.transactions]});
+                if(event.transactionHash===this.state.sendingTransactionHash){
+                  this.setState({sendingTransactionConfirmed:true});
+                }
                 this.getAccountDetails();
               }else{
                 console.log("Someone just did a transaction where you are neither a sender nor a receiver!");
@@ -165,7 +185,7 @@ class App extends Component{
   }//componentDidMount ends
 
   render(){
-    // console.log(this.state.transactions);//debug
+    console.log(this.state.sendingTransactionHash,this.state.sendingTransactionConfirmed,this.state.sendingTransactionError)//debug
     if(this.isWeb3 && !this.state.isWeb3Locked){
       // web3 is available and also the wallet is unlocked
       if(this.props.type==="wallet"){
@@ -174,9 +194,10 @@ class App extends Component{
           <DetWall accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress} tokenName={this.state.tokenName} transactions={this.state.transactions}/>
         );
       }else if(this.props.type==="send"){
+        //TODO: set the sendingTransactionHash,sendingTransactionError,sendingTransactionConfirmed to null
         // nav, details, send
         return(
-          <DetSend accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress} tokenName={this.state.tokenName}/>
+          <DetSend accountAddress={this.state.accountAddress} accountBalance={this.state.accountBalance} tokenSymbol={this.state.tokenSymbol} tokenDecimals={this.state.tokenDecimals} networkName={this.state.networkName} tokenAddress={this.state.tokenAddress} tokenName={this.state.tokenName} sendingTransactionHash={this.state.sendingTransactionHash} sendingTransactionError={this.state.sendingTransactionError} sendingTransactionConfirmed={this.state.sendingTransactionConfirmed} onTransfer={this.handleTransfer}/>
         );
       }
     }else if(this.isWeb3 && this.state.isWeb3Locked){

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Navbar from './navbar.jsx';
 import Details from './details.jsx';
+import Transfer from './transfer.jsx';
 
 class DetSend extends Component{
   render(){
@@ -16,6 +17,14 @@ class DetSend extends Component{
             </div>
             <div className="col-md-3"></div>
           </div>
+          <br></br>
+            <div className="row">
+              <div className="col-md-2"></div>
+              <div className="col-md-8">
+                <Transfer accountBalance={this.props.accountBalance} tokenSymbol={this.props.tokenSymbol} tokenDecimals={this.props.tokenDecimals} sendingTransactionHash={this.props.sendingTransactionHash} sendingTransactionError={this.props.sendingTransactionError} sendingTransactionConfirmed={this.props.sendingTransactionConfirmed} onTransfer={this.props.onTransfer}/>
+              </div>
+              <div className="col-md-2"></div>
+            </div>
         </div>
       </React.Fragment>
     );

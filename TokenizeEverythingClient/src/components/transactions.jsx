@@ -18,7 +18,7 @@ class TransactionsTable extends Component{
           <hr className="my-2"/>
           <div>
             {this.props.transactions.map((transaction)=>
-              <Transaction key={transaction.etherScanURL} transaction={transaction} tokenSymbol={this.props.tokenSymbol} />
+              <Transaction key={transaction.trxnHash} transaction={transaction} tokenSymbol={this.props.tokenSymbol} />
             )}
           </div>
         </div>
