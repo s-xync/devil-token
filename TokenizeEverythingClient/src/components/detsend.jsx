@@ -21,7 +21,7 @@ class DetSend extends Component{
             <div className="row">
               <div className="col-md-2"></div>
               <div className="col-md-8">
-                <Transfer accountBalance={this.props.accountBalance} tokenSymbol={this.props.tokenSymbol} tokenDecimals={this.props.tokenDecimals} sendingTransactionHash={this.props.sendingTransactionHash} sendingTransactionError={this.props.sendingTransactionError} sendingTransactionConfirmed={this.props.sendingTransactionConfirmed} onTransfer={this.props.onTransfer}/>
+                <Transfer accountAddress={this.props.accountAddress} accountBalance={this.props.accountBalance} tokenSymbol={this.props.tokenSymbol} tokenDecimals={this.props.tokenDecimals} tokenizeEverything={this.props.tokenizeEverything}/>
               </div>
               <div className="col-md-2"></div>
             </div>
