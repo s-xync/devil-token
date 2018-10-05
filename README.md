@@ -1,4 +1,7 @@
 #### Tokenize Everything
+
+Tokenize Everything creates an ERC20 Token and gives you a Front-End web app to manage it by showing all transactions sent or received previously and also to make new sending transactions. Tokenize Everything uses ReactJS for front-end. The ERC20 Token is a Smart Contract deployed on Ethereum Virtual Machine and the ReactJS app communicates with the Smart Contract using Web3. It uses the Local Storage provided by browser for a more smoother experience.  
+
 Make sure you have truffle installed.  
 Run `npm install` in this folder first.  
 Then run any test network provider on your computer.  
@@ -16,6 +19,6 @@ Then, create a file called `.env` in the project home folder and inside it, set 
 
 Now all you have to do is run `truffle compile` and `truffle migrate --network ropsten` or `truffle migrate --reset --network ropsten`(if deploying again).  
 
-Head on over to `TokenizeEverythingClient` folder for further instructions.  
+Head on over to [TokenizeEverythingClient](https://github.com/s-xync/tokenize-everything/tree/master/TokenizeEverythingClient) folder for further instructions.  
 
 Thanks!
