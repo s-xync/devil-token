@@ -2,9 +2,18 @@
 
 Tokenize Everything creates an ERC20 Token and gives you a Front-End web app to manage it by showing all transactions sent or received previously and also to make new sending transactions. Tokenize Everything uses ReactJS for front-end. The ERC20 Token is a Smart Contract deployed on Ethereum Virtual Machine and the ReactJS app communicates with the Smart Contract using Web3. It uses the Local Storage provided by browser for a more smoother experience.  
 
+Navigate to the end of this page to try it out for yourself.  
+
 ##### Showcase  
 The design specifications for this project can be found [here](https://github.com/s-xync/tokenize-everything/blob/master/showcase/Project_Specifications.pdf).  
-[Image1](https://raw.githubusercontent.com/s-xync/tokenize-everything/master/showcase/tkev1.png){:height="50%" width="50%"}
+![Image1](https://raw.githubusercontent.com/s-xync/tokenize-everything/master/showcase/tkev1.png)
+![Image2](https://raw.githubusercontent.com/s-xync/tokenize-everything/master/showcase/tkev2.png)
+![Image3](https://raw.githubusercontent.com/s-xync/tokenize-everything/master/showcase/tkev3.png)
+![Image4](https://raw.githubusercontent.com/s-xync/tokenize-everything/master/showcase/tkev4.png)
+![Image5](https://raw.githubusercontent.com/s-xync/tokenize-everything/master/showcase/tkev5.png)
+![Image6](https://raw.githubusercontent.com/s-xync/tokenize-everything/master/showcase/tkev6.png)
+![Image7](https://raw.githubusercontent.com/s-xync/tokenize-everything/master/showcase/tkev7.png)
+
 
 ##### Installation  
 To see this yourself, just follow the process below...  
